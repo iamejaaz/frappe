@@ -59,6 +59,10 @@ class Comment(Document):
 		notify_mentions(self.reference_doctype, self.reference_name, self.content)
 		self.notify_change("add")
 
+		# update modified timestamp of reference document
+		if frappe.db.get_single_value("System Settings", "update_timestamp_on_new_comment"):
+			frappe.get_doc(self.reference_doctype, self.reference_name).update_modified()
+
 	def validate(self):
 		if not self.comment_email:
 			self.comment_email = frappe.session.user

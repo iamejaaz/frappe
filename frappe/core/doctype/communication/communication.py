@@ -196,6 +196,12 @@ class Communication(Document, CommunicationEmailMixin):
 
 		self.notify_change("add")
 
+		# update modified timestamp of reference document
+		if self.sent_or_received == "Received" and frappe.db.get_single_value(
+			"System Settings", "update_timestamp_on_new_communication"
+		):
+			frappe.get_doc(self.reference_doctype, self.reference_name).update_modified()
+
 	def set_signature_in_email_content(self):
 		"""Set sender's User.email_signature or default outgoing's EmailAccount.signature to the email"""
 		if not self.content:

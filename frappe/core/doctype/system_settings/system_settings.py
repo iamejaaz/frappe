@@ -96,6 +96,8 @@ class SystemSettings(Document):
 		time_format: DF.Literal["HH:mm:ss", "HH:mm"]
 		time_zone: DF.Literal[None]
 		two_factor_method: DF.Literal["OTP App", "SMS", "Email"]
+		update_timestamp_on_new_comment: DF.Check
+		update_timestamp_on_new_communication: DF.Check
 		use_number_format_from_currency: DF.Check
 		welcome_email_template: DF.Link | None
 	# end: auto-generated types

@@ -29,6 +29,10 @@
   "apply_strict_user_permissions",
   "column_break_21",
   "allow_older_web_view_links",
+  "activity_section",
+  "update_timestamp_on_new_comment",
+  "column_break_ypvn",
+  "update_timestamp_on_new_communication",
   "security_tab",
   "security",
   "session_expiry",
@@ -699,12 +703,33 @@
    "fieldname": "hide_empty_read_only_fields",
    "fieldtype": "Check",
    "label": "Hide Empty Read-Only Fields"
+  },
+  {
+   "fieldname": "activity_section",
+   "fieldtype": "Section Break",
+   "label": "Activity"
+  },
+  {
+   "default": "0",
+   "fieldname": "update_timestamp_on_new_comment",
+   "fieldtype": "Check",
+   "label": "Update timestamp on new comment"
+  },
+  {
+   "fieldname": "column_break_ypvn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "update_timestamp_on_new_communication",
+   "fieldtype": "Check",
+   "label": "Update timestamp on new communication."
   }
  ],
  "icon": "fa fa-cog",
  "issingle": 1,
  "links": [],
- "modified": "2024-12-03 16:23:09.410614",
+ "modified": "2025-01-14 17:20:11.784170",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "System Settings",
