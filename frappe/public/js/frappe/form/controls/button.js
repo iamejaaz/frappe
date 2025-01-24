@@ -7,9 +7,8 @@ frappe.ui.form.ControlButton = class ControlButton extends frappe.ui.form.Contro
 		var me = this;
 		const btn_type = this.df.primary ? "btn-primary" : "btn-default";
 		const btn_size = this.df.btn_size ? `btn-${this.df.btn_size}` : "btn-xs";
-		this.$input = $(
-			`<button class="btn ${btn_size} ${btn_type} ellipsis" title="${this.df.label}">`
-		)
+		this.$input = $(`<button class="btn ${btn_size} ${btn_type} ellipsis">`)
+			.attr("title", this.df.label)
 			.prependTo(me.input_area)
 			.on("click", function () {
 				me.onclick();
