@@ -62,8 +62,4 @@ def execute():
 		current = current[0].get("current")
 
 		for uniq_expr in uniq_exprs:
-			expr_exists = (frappe.qb.from_(Series).select("*").where(Series.name == uniq_expr)).run(
-				as_dict=True
-			)
-			if not expr_exists:
-				(frappe.qb.into(Series).columns("name", "current").insert(uniq_expr, current + 1)).run()
+			(frappe.qb.into(Series).columns("name", "current").insert(uniq_expr, current + 1).ignore()).run()
