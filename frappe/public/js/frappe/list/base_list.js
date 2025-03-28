@@ -309,6 +309,7 @@ frappe.views.BaseList = class BaseList {
 				this.show_or_hide_sidebar,
 				this.setup_filter_area,
 				this.setup_sort_selector,
+				this.setup_result_container_area,
 				this.setup_result_area,
 				this.setup_no_result_area,
 				this.setup_freeze_area,
@@ -349,9 +350,13 @@ frappe.views.BaseList = class BaseList {
 		this.refresh();
 	}
 
+	setup_result_container_area() {
+		this.$frappe_list.append($(`<div class="result-container">`));
+	}
+
 	setup_result_area() {
 		this.$result = $(`<div class="result">`);
-		this.$frappe_list.append(this.$result);
+		this.$frappe_list.find('.result-container').append(this.$result);
 	}
 
 	setup_no_result_area() {

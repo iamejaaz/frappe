@@ -93,7 +93,8 @@
 }
 
 .layout-main-section-wrapper {
-	width: 100%;
+	width: 80%;
+	flex: 1 0 80%;
 }
 
 .layout-main-section.frappe-card {
@@ -184,11 +185,37 @@
 		.result,
 		.no-result,
 		.freeze {
-			min-height: "200px";
+			min-height: 200px;
 		}
 
 		.result {
 			overflow: auto;
+		}
+	}
+	.frappe-list{
+		.result-container{
+			overflow-x: auto;
+			.result{
+				width: auto;
+				min-width: 100%;
+			}
+			.list-row-container {
+				width: fit-content;
+				min-width: 100%;
+			}
+			.list-row-container:first-child {
+				position: sticky;
+				top: 0;
+				z-index: 2;
+			}
+			.list-row-container {
+				.level-left {
+					.list-row-col {
+						min-width: 150px;
+						max-width: 400px;
+					}
+				}
+			}
 		}
 	}
 
