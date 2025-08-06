@@ -1,0 +1,24 @@
+{
+ "content": null,
+ "creation": "2025-07-02 16:29:17.845620",
+ "docstatus": 0,
+ "doctype": "Page",
+ "icon": "fa fa-calendar",
+ "idx": 0,
+ "modified": "2025-07-02 16:30:58.760908",
+ "modified_by": "Administrator",
+ "module": "Core",
+ "name": "unified-calendar",
+ "owner": "Administrator",
+ "page_name": "unified-calendar",
+ "roles": [
+  {
+   "role": "All"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "Unified Calendar"
+}
