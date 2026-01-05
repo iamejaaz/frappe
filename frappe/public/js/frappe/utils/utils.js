@@ -942,44 +942,21 @@ Object.assign(frappe.utils, {
 		let route = route_str.split("/");
 
 		if (route[2] === "Report" || route[0] === "query-report") {
-			return (
-				frappe.search.utils.make_icon("table") +
-				(__(route[3]) || __(route[1])).bold() +
-				" " +
-				__("Report")
-			);
+			return (__(route[3]) || __(route[1])).bold() + " " + __("Report");
 		}
 		if (route[0] === "List") {
-			return frappe.search.utils.make_icon("list") + __(route[1]).bold() + " " + __("List");
+			__(route[1]).bold() + " " + __("List");
 		}
 		if (route[0] === "modules") {
-			return (
-				frappe.search.utils.make_icon("component") +
-				__(route[1]).bold() +
-				" " +
-				__("Module")
-			);
+			return __(route[1]).bold() + " " + __("Module");
 		}
 		if (route[0] === "Workspaces") {
-			return (
-				frappe.search.utils.make_icon("wallpaper") +
-				__(route[1]).bold() +
-				" " +
-				__("Workspace")
-			);
+			return __(route[1]).bold() + " " + __("Workspace");
 		}
 		if (route[0] === "dashboard") {
-			return (
-				frappe.search.utils.make_icon("dashboard") +
-				__(route[1]).bold() +
-				" " +
-				__("Dashboard")
-			);
+			return __(route[1]).bold() + " " + __("Dashboard");
 		}
-		return (
-			frappe.search.utils.make_icon("file-text") +
-			__(frappe.utils.to_title_case(__(route[0]), true))
-		);
+		return __(frappe.utils.to_title_case(__(route[0]), true));
 	},
 	report_column_total: function (values, column, type) {
 		if (column.column.disable_total) {

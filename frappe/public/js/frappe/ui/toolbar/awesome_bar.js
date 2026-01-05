@@ -28,7 +28,7 @@ frappe.search.AwesomeBar = class AwesomeBar {
 		});
 
 		let search_modal_body = `<div class="align-baseline flex py-2 px-1 relative navbar-modal-wrapper">
-			<div class="modal-search-icon absolute pr-2 pl-3">${frappe.utils.icon("search")}</div>
+			<div class="modal-search-icon absolute pr-2 pl-2">${frappe.utils.icon("search")}</div>
 			<input
 				id="navbar-search"
 				type="text"
@@ -364,10 +364,7 @@ frappe.search.AwesomeBar = class AwesomeBar {
 		this.options.push({
 			label: `
 				<span class="flex justify-between text-medium">
-					<span class="ellipsis">${
-						frappe.search.utils.make_icon("search") +
-						__("Search for {0}", [frappe.utils.xss_sanitise(txt).bold()])
-					}</span>
+					<span class="ellipsis">${__("Search for {0}", [frappe.utils.xss_sanitise(txt).bold()])}</span>
 					<kbd>↵</kbd>
 				</span>
 			`,
@@ -392,12 +389,10 @@ frappe.search.AwesomeBar = class AwesomeBar {
 			var options = {};
 			options[search_field] = ["like", "%" + txt + "%"];
 			this.options.push({
-				label:
-					frappe.search.utils.make_icon("search") +
-					__("Find {0} in {1}", [
-						frappe.utils.xss_sanitise(txt).bold(),
-						__(route[1]).bold(),
-					]),
+				label: __("Find {0} in {1}", [
+					frappe.utils.xss_sanitise(txt).bold(),
+					__(route[1]).bold(),
+				]),
 				value: __("Find {0} in {1}", [frappe.utils.xss_sanitise(txt), __(route[1])]),
 				route_options: options,
 				onclick: function () {
@@ -464,7 +459,7 @@ frappe.search.AwesomeBar = class AwesomeBar {
 	make_random(txt) {
 		if (txt.toLowerCase().includes("random")) {
 			this.options.push({
-				label: frappe.search.utils.make_icon("key") + __("Generate Random Password"),
+				label: __("Generate Random Password"),
 				value: frappe.utils.get_random(16),
 				onclick: function () {
 					frappe.msgprint(frappe.utils.get_random(16), __("Result"));
