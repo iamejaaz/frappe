@@ -945,7 +945,7 @@ Object.assign(frappe.utils, {
 			return (__(route[3]) || __(route[1])).bold() + " " + __("Report");
 		}
 		if (route[0] === "List") {
-			__(route[1]).bold() + " " + __("List");
+			return __(route[1]).bold() + " " + __("List");
 		}
 		if (route[0] === "modules") {
 			return __(route[1]).bold() + " " + __("Module");
