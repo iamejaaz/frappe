@@ -5,6 +5,11 @@ frappe.search.utils = {
 	setup_recent: function () {
 		this.recent = JSON.parse(frappe.boot.user.recent || "[]") || [];
 	},
+	make_icon(name) {
+		return `<span style="padding: 0 3px; margin-right: 5px;">${frappe.utils.icon(
+			name
+		)}</span>`;
+	},
 	results_to_hide: [],
 	get_recent_pages: function (keywords) {
 		if (keywords === null) keywords = "";
@@ -66,10 +71,10 @@ frappe.search.utils = {
 				const doctype = route[1];
 				if (route.length > 2 && doctype !== route[2]) {
 					const docname = route[2];
-					out.label = __(doctype) + " " + docname.bold();
+					out.label = me.make_icon("sticky-note") + __(doctype) + " " + docname.bold();
 					out.value = __(doctype) + " " + docname;
 				} else {
-					out.label = __(doctype).bold();
+					out.label = me.make_icon("sticky-note") + __(doctype).bold();
 					out.value = __(doctype);
 				}
 			} else if (
@@ -79,27 +84,33 @@ frappe.search.utils = {
 				const view_type = route[0];
 				const view_name = route[1];
 
-				let labelSuffix;
+				let icon, labelSuffix;
 
 				switch (view_type) {
 					case "List":
+						icon = me.make_icon("list");
 						labelSuffix = __("List");
 						break;
 					case "Tree":
+						icon = me.make_icon("list-tree");
 						labelSuffix = __("Tree");
 						break;
 					case "Workspaces":
+						icon = me.make_icon("wallpaper");
 						labelSuffix = __("Workspace");
 						break;
 					case "query-report":
+						icon = me.make_icon("table");
 						labelSuffix = __("Report");
 						break;
 				}
 
-				out.label = __(view_name.bold()) + " " + labelSuffix;
+				out.label = icon + __(view_name.bold()) + " " + labelSuffix;
 				out.value = __(view_name) + " " + labelSuffix;
 			} else if (match[0]) {
-				out.label = frappe.utils.escape_html(match[0]).bold();
+				out.label =
+					me.make_icon(me.recent ? "circle-dashed" : "file-text") +
+					frappe.utils.escape_html(match[0]).bold();
 				out.value = match[0];
 			} else {
 				console.log("Illegal match", match);
@@ -175,7 +186,9 @@ frappe.search.utils = {
 				if (level) {
 					out.push({
 						type: "New",
-						label: __("New {0}", [search_result.marked_string || __(item)]),
+						label:
+							me.make_icon("circle-plus") +
+							__("New {0}", [search_result.marked_string || __(item)]),
 						value: __("New {0}", [__(item)]),
 						index: 1 + level,
 						match: item,
@@ -203,6 +216,13 @@ frappe.search.utils = {
 			} else {
 				label = __(`{0} ${skip_list ? "" : type}`, [marked_string || __(target)]);
 			}
+			if (type === "List") {
+				label = me.make_icon("list") + label;
+			} else if (type === "Report") {
+				label = me.make_icon("table") + label;
+			} else {
+				label = me.make_icon("search") + label;
+			}
 			return {
 				type: type,
 				label: label,
@@ -225,7 +245,9 @@ frappe.search.utils = {
 						var match = item;
 						out.push({
 							type: "New",
-							label: __("New {0}", [search_result.marked_string || __(item)]),
+							label:
+								me.make_icon("circle-plus") +
+								__("New {0}", [search_result.marked_string || __(item)]),
 							value: __("New {0}", [__(item)]),
 							index: score + 0.015,
 							match: item,
@@ -259,7 +281,9 @@ frappe.search.utils = {
 				else route = ["query-report", item];
 				out.push({
 					type: "Report",
-					label: __("Report {0}", [search_result.marked_string || __(item)]),
+					label:
+						me.make_icon("grid-3x3") +
+						__("Report {0}", [search_result.marked_string || __(item)]),
 					value: __("Report {0}", [__(item)]),
 					index: level,
 					route: route,
@@ -285,7 +309,9 @@ frappe.search.utils = {
 				var page = me.pages[item];
 				out.push({
 					type: "Page",
-					label: __("Open {0}", [search_result.marked_string || __(item)]),
+					label:
+						me.make_icon("file-text") +
+						__("Open {0}", [search_result.marked_string || __(item)]),
 					value: __("Open {0}", [__(item)]),
 					match: item,
 					index: level,
@@ -297,7 +323,7 @@ frappe.search.utils = {
 		if (__("calendar").indexOf(keywords.toLowerCase()) === 0) {
 			out.push({
 				type: "Calendar",
-				label: __("Open {0}", [__(target)]),
+				label: me.make_icon("calendar") + __("Open {0}", [__(target)]),
 				value: __("Open {0}", [__(target)]),
 				index: me.fuzzy_search(keywords, "Calendar"),
 				match: target,
@@ -308,7 +334,7 @@ frappe.search.utils = {
 		if (__("hub").indexOf(keywords.toLowerCase()) === 0) {
 			out.push({
 				type: "Hub",
-				label: __("Open {0}", [__(target)]),
+				label: me.make_icon("earth-lock") + __("Open {0}", [__(target)]),
 				value: __("Open {0}", [__(target)]),
 				index: me.fuzzy_search(keywords, "Hub"),
 				match: target,
@@ -318,7 +344,7 @@ frappe.search.utils = {
 		if (__("email inbox").indexOf(keywords.toLowerCase()) === 0) {
 			out.push({
 				type: "Inbox",
-				label: __("Open {0}", [__("Email Inbox")]),
+				label: me.make_icon("inbox") + __("Open {0}", [__("Email Inbox")]),
 				value: __("Open {0}", [__("Email Inbox")]),
 				index: me.fuzzy_search(keywords, "email inbox"),
 				match: target,
@@ -337,7 +363,9 @@ frappe.search.utils = {
 			if (level > 0) {
 				var ret = {
 					type: "Workspace",
-					label: __("Open {0}", [search_result.marked_string || __(item.name)]),
+					label:
+						me.make_icon("wallpaper") +
+						__("Open {0}", [search_result.marked_string || __(item.name)]),
 					value: __("Open {0}", [__(item.name)]),
 					index: level,
 					route: [frappe.router.slug(item.name)],
@@ -358,7 +386,9 @@ frappe.search.utils = {
 			if (level > 0) {
 				var ret = {
 					type: "Dashboard",
-					label: __("{0} Dashboard", [search_result.marked_string || __(item.name)]),
+					label:
+						me.make_icon("layout-dashboard") +
+						__("{0} Dashboard", [search_result.marked_string || __(item.name)]),
 					value: __("{0} Dashboard", [__(item.name)]),
 					index: level,
 					route: ["dashboard-view", item.name],
@@ -680,7 +710,9 @@ frappe.search.utils = {
 			const search_result = me.fuzzy_search(keywords, item.title, true);
 			if (search_result.score > 0) {
 				var ret = {
-					label: __("Install {0} from Marketplace", [search_result.marked_string]),
+					label:
+						me.make_icon("arrow-down-from-line") +
+						__("Install {0} from Marketplace", [search_result.marked_string]),
 					value: __("Install {0} from Marketplace", [__(item.title)]),
 					index: search_result.score * 0.8,
 					route: [
