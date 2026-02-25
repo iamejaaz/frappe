@@ -224,9 +224,6 @@ def _download_multi_pdf(
 			frappe.local.response.type = "pdf"
 
 
-from frappe.deprecation_dumpster import read_multi_pdf
-
-
 @frappe.whitelist(allow_guest=True)
 def download_pdf(
 	doctype: str,
