@@ -73,12 +73,15 @@ let url = computed(() => {
 	params.append("doctype", doctype.value);
 	params.append("name", docname.value);
 	params.append("print_format", print_format.value.name);
+	params.append("pdf_generator", "chrome");
 
 	if (store.value.letterhead) {
 		params.append("letterhead", store.value.letterhead.name);
 	}
 	let _url =
-		type.value == "PDF" ? `/api/method/frappe.utils.weasyprint.download_pdf` : "/printpreview";
+		type.value == "PDF"
+			? `/api/method/frappe.utils.print_format.download_pdf`
+			: "/printpreview";
 	return `${_url}?${params.toString()}`;
 });
 
