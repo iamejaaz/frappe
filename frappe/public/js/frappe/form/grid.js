@@ -109,6 +109,9 @@ export default class Grid {
 							<button type="button" class="grid-download btn btn-xs btn-secondary hidden">
 								${__("Download")}
 							</button>
+							<button type="button" class="grid-full-screen btn btn-xs btn-secondary">
+								${__("Full Screen")}
+							</button>
 							<button type="button" class="grid-upload btn btn-xs btn-secondary hidden">
 								${__("Upload")}
 							</button>
@@ -152,6 +155,8 @@ export default class Grid {
 		this.remove_all_rows_button = this.grid_buttons.find(".grid-remove-all-rows");
 
 		this.setup_allow_bulk_edit();
+		this.setup_full_screen();
+
 		this.setup_check();
 		if (this.df.on_setup) {
 			this.df.on_setup(this);
@@ -1293,6 +1298,36 @@ export default class Grid {
 					return false;
 				});
 		}
+	}
+
+	setup_full_screen(){
+		$(this.wrapper).find(".grid-full-screen").on("click", () => {
+			let grid_html = this.wrapper.find(".form-grid-container").html();
+
+			let d = new frappe.ui.Dialog({
+				title: "Full Screen Table",
+				fields: [
+					{
+						fieldtype: "HTML",
+						fieldname: "grid_html"
+					}
+				]
+			});
+
+			$(d.$wrapper).find(".modal-dialog").css({
+				"width": "100%",
+				"max-width": "100%",
+				"height": "100%",
+				"margin": 0,
+			});
+			$(d.$wrapper).find(".modal-header").hide();
+			$(d.$wrapper).find(".modal-content").css({
+				"height": "100%",
+			});
+
+			d.show();
+			d.fields_dict.grid_html.$wrapper.html(grid_html);
+		})
 	}
 
 	setup_download() {
