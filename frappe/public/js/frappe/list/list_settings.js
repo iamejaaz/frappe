@@ -117,15 +117,25 @@ export default class ListSettings {
 	 				data-type="${me.fields[idx].type}">
 
 					<div class="row flex-fill align-items-center">
-						<div class="col-1 d-flex align-items-center justify-content-center px-1">
+						<div class="col-1 flex align-items-center justify-content-center px-1">
 							${frappe.utils.icon("drag", "xs", "", "", "sortable-handle " + show_sortable_handle)}
 						</div>
 
-						<div class="col d-flex align-items-center px-0">
+						<div class="col flex align-items-center px-0">
 							${__(me.fields[idx].label, null, me.doctype)}
 						</div>
 
-						<div class="col-1 d-flex align-items-center justify-content-center px-0">
+						<div class="col-2">
+							<input
+								type="number"
+								max="400"
+								class='form-control text-right'
+								data-fieldname='${me.fields[idx].fieldname}'
+								style='background-color: var(--modal-bg); height: 22px;'
+							>
+						</div>
+
+						<div class="col-1 flex align-items-center justify-content-center px-0">
 							<a class="text-muted remove-field align-items-center ${can_remove}"
 							   data-fieldname="${me.fields[idx].fieldname}">
 								${frappe.utils.icon("x", "xs")}
