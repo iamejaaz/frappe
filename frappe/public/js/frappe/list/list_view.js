@@ -448,18 +448,6 @@ frappe.views.ListView = class ListView extends frappe.views.BaseList {
 			this.columns = this.reorder_listview_fields();
 		}
 
-		// limit max to 8 columns if no total_fields is set in List View Settings
-		// Screen with low density no of columns 4
-		// Screen with medium density no of columns 6
-		// Screen with high density no of columns 8
-		let total_fields = 6;
-
-		if (window.innerWidth <= 1366) {
-			total_fields = 4;
-		} else if (window.innerWidth >= 1920) {
-			total_fields = 10;
-		}
-
 		this.columns = this.columns.slice(0, this.max_number_of_fields);
 
 		// 2nd column: tag - normally hidden doesn't count towards total_fields
@@ -757,7 +745,6 @@ frappe.views.ListView = class ListView extends frappe.views.BaseList {
 					col.type == "Subject" ? "list-subject level" : "hidden-xs",
 					col.type == "Tag" ? `tag-col ${!this.tags_shown ? "hide" : ""} ` : "",
 					frappe.model.is_numeric_field(col.df) ? "text-right" : "",
-					col.df?.fieldname,
 				].join(" ");
 
 				let html = "";
@@ -771,7 +758,7 @@ frappe.views.ListView = class ListView extends frappe.views.BaseList {
 					html = `<span ${attrs}>${label}</span>`;
 				}
 
-				return `<div class="${classes}">${html}</div>
+				return `<div class="${classes}" data-fieldname="${col.df?.fieldname}">${html}</div>
 			`;
 			})
 			.join("");
@@ -1010,7 +997,6 @@ frappe.views.ListView = class ListView extends frappe.views.BaseList {
 			"list-row-col ellipsis",
 			class_map[col.type],
 			frappe.model.is_numeric_field(df) ? "text-right" : "",
-			fieldname,
 		].join(" ");
 
 		let column_html;
@@ -1051,7 +1037,7 @@ frappe.views.ListView = class ListView extends frappe.views.BaseList {
 		}
 
 		return `
-			<div class="${css_class}">
+			<div class="${css_class}" data-fieldname="${fieldname}">
 				${column_html}
 			</div>
 		`;
@@ -1065,7 +1051,9 @@ frappe.views.ListView = class ListView extends frappe.views.BaseList {
 	apply_column_widths() {
 		if (this.list_view_settings?.disable_scrolling) return;
 		Object.entries(this.column_max_widths).forEach(([fieldname, width]) => {
-			$(`.list-view .frappe-list .result .level-left .list-row-col.${fieldname}`).css({
+			$(
+				`.list-view .frappe-list .result .level-left .list-row-col[data-fieldname="${fieldname}"]`
+			).css({
 				width: width,
 				flex: `1 0 ${width}px`,
 			});
