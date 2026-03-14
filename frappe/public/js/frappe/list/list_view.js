@@ -1000,11 +1000,8 @@ frappe.views.ListView = class ListView extends frappe.views.BaseList {
 		].join(" ");
 
 		let column_html;
-		if (
-			this.settings.formatters &&
-			this.settings.formatters[fieldname] &&
-			col.type !== "Subject"
-		) {
+		const formatter = this.settings.formatters?.[fieldname];
+		if (formatter && col.type !== "Subject") {
 			column_html = this.settings.formatters[fieldname](value, df, doc);
 		} else {
 			column_html = {
@@ -1017,23 +1014,24 @@ frappe.views.ListView = class ListView extends frappe.views.BaseList {
 			css_class += " bold";
 		}
 
-		/**
-		 * Calculates the width of a text element based on its length.
-		 * If the length of the text is not available, it defaults to a length of 22.5.
-		 */
-		let textLength = $(column_html).text()?.trim()?.length || 22.5;
-		let calculatedWidth = (textLength * 10) / 1.3 + (col.type == "Subject" ? 30 : 0);
+		if (!frappe.is_mobile()) {
+			/**
+			 * Calculates the width of a text element based on its length.
+			 * If the length of the text is not available, it defaults to a length of 22.5.
+			 */
+			let textLength = $(column_html).text()?.trim()?.length || 22.5;
+			let calculatedWidth = (textLength * 10) / 1.3 + (col.type == "Subject" ? 30 : 0);
 
-		/**
-		 * Updates the `column_max_widths` object by setting the maximum width for a specific column (fieldname).
-		 * If no width is set for the column, or the newly calculated width exceeds the current width, the width is updated.
-		 */
-		if (
-			(!this.column_max_widths[fieldname] ||
-				calculatedWidth > this.column_max_widths[fieldname]) &&
-			!frappe.is_mobile()
-		) {
-			this.column_max_widths[fieldname] = calculatedWidth;
+			/**
+			 * Updates the `column_max_widths` object by setting the maximum width for a specific column (fieldname).
+			 * If no width is set for the column, or the newly calculated width exceeds the current width, the width is updated.
+			 */
+			if (
+				!this.column_max_widths[fieldname] ||
+				calculatedWidth > this.column_max_widths[fieldname]
+			) {
+				this.column_max_widths[fieldname] = calculatedWidth;
+			}
 		}
 
 		return `
