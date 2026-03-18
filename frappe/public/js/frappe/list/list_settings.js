@@ -101,6 +101,10 @@ export default class ListSettings {
 		let wrapper = fields_html.$wrapper[0];
 		let fields = ``;
 
+		const listview_columns = (me.listview.columns = me.listview.columns.filter(
+			(col) => col.type !== "Tag"
+		));
+
 		for (let idx in me.fields) {
 			if (idx == parseInt(this.max_number_of_fields)) {
 				break;
@@ -127,11 +131,12 @@ export default class ListSettings {
 
 						<div class="col-2">
 							<input
-								type="number"
-								max="400"
-								class='form-control text-right'
-								data-fieldname='${me.fields[idx].fieldname}'
-								style='background-color: var(--modal-bg); height: 22px;'
+								inputmode="numeric"
+								autocomplete="number"
+								class="form-control text-right"
+								data-fieldname="${me.fields[idx].fieldname}"
+								style="background-color: var(--modal-bg); height: 22px;"
+								value="${cint(listview_columns[idx]?.df?.width)}"
 							>
 						</div>
 
