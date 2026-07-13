@@ -251,7 +251,7 @@ class EmailQueue(Document):
 								mail_options=mail_options,
 								rcpt_options=rcpt_options,
 							)
-						except smtplib.SMTPResponseException:
+						except smtplib.SMTPException:
 							# A failed send can leave the server-side transaction
 							# open even though our cached session still looks
 							# alive (NOOP succeeds). Reusing it would fail every
