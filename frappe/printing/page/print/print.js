@@ -878,14 +878,16 @@ frappe.ui.form.PrintView = class {
 		}
 	}
 
+	default_format() {
+		return this.frm._layout_print_format || this.frm.meta.default_print_format || "";
+	}
+
 	set_default_print_format() {
-		const default_format =
-			this.frm._layout_print_format || this.frm.meta.default_print_format || "";
-		this.print_format_selector.val(default_format);
+		this.print_format_selector.val(this.default_format());
 	}
 
 	selected_format() {
-		return this.print_format_selector.val() || "Standard";
+		return this.print_format_selector.val() || this.default_format() || "Standard";
 	}
 
 	is_raw_printing(format) {
