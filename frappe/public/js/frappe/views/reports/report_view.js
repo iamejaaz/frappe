@@ -262,6 +262,24 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 		this.setup_datatable(this.data);
 	}
 
+	// HyperList reads the scrollable's size once at construction; if the page had no
+	// layout at that moment (hidden page-container, background tab) it locks in an
+	// inline 0x0 that even datatable.refresh() reads back. Rebuild once we have size.
+	recover_from_zero_size_render() {
+		this.zero_size_observer?.disconnect();
+		const wrapper = this.$datatable_wrapper[0];
+		this.zero_size_observer = new ResizeObserver(() => {
+			if (!wrapper.offsetWidth) return;
+			this.zero_size_observer.disconnect();
+			this.zero_size_observer = null;
+			const scrollable = wrapper.querySelector(".dt-scrollable");
+			if (scrollable && (!scrollable.offsetWidth || !scrollable.offsetHeight)) {
+				this.render(true);
+			}
+		});
+		this.zero_size_observer.observe(wrapper);
+	}
+
 	get_count_element() {
 		let $count = this.$paging_area.find(".list-count");
 		if (!$count.length) {
@@ -336,6 +354,7 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 
 	setup_datatable(values) {
 		this.$datatable_wrapper.empty();
+		this.recover_from_zero_size_render();
 		this.datatable = new DataTable(this.$datatable_wrapper[0], {
 			columns: this.columns,
 			data: this.get_data(values),
