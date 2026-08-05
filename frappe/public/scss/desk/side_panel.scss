@@ -109,6 +109,16 @@ body.side-panel-resizing {
 	.section-body {
 		max-width: none;
 	}
+
+	.form-tabs-list {
+		top: 0;
+		padding: 0 var(--padding-sm);
+		background-color: var(--surface-base);
+	}
+
+	.form-tab-content {
+		margin-top: 0;
+	}
 }
 
 .side-panel-message {

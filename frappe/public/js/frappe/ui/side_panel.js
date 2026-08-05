@@ -159,11 +159,71 @@ function render_child_table($columns, df, doc, ctx) {
 	}
 }
 
+function split_into_tabs(fields) {
+	const tabs = [];
+	let current = { df: null, fields: [] };
+	for (const df of fields) {
+		if (df.fieldtype === "Tab Break") {
+			if (current.df || current.fields.length) tabs.push(current);
+			current = { df, fields: [] };
+			continue;
+		}
+		current.fields.push(df);
+	}
+	if (current.df || current.fields.length) tabs.push(current);
+	return tabs;
+}
+
 function render_doc_fields(container, doctype, doc, ctx) {
 	const meta = ctx.metas[doctype];
-	const $root = $('<div class="side-panel-detail form-layout"></div>').appendTo(container);
 	const parent = ctx.parent || null;
+	const $root = $('<div class="side-panel-detail form-layout"></div>').appendTo(container);
 
+	const tabs = split_into_tabs(meta.fields).filter(
+		(tab) =>
+			!tab.df ||
+			(!tab.df.hidden &&
+				(!tab.df.depends_on || passes_depends_on(tab.df.depends_on, doc, parent)))
+	);
+
+	if (tabs.length <= 1) {
+		render_fields_into($root, tabs[0]?.fields || [], doc, ctx, parent);
+		return;
+	}
+
+	const $tabs_list = $(
+		'<div class="form-tabs-list"><ul class="nav form-tabs" role="tablist"></ul></div>'
+	).appendTo($root);
+	const $nav = $tabs_list.find(".form-tabs");
+	const $content = $('<div class="form-tab-content tab-content"></div>').appendTo($root);
+
+	for (const tab of tabs) {
+		const $item = $(
+			'<li class="nav-item"><button class="nav-link" type="button" role="tab"></button></li>'
+		).appendTo($nav);
+		const $link = $item.find(".nav-link").text(__(tab.df?.label || __("Details")));
+		const $pane = $('<div class="tab-pane fade" role="tabpanel"></div>').appendTo($content);
+		render_fields_into($pane, tab.fields, doc, ctx, parent);
+
+		if (!$pane.find(".frappe-control").length) {
+			$item.remove();
+			$pane.remove();
+			continue;
+		}
+
+		$link.on("click", () => {
+			$nav.find(".nav-link").removeClass("active");
+			$content.find(".tab-pane").removeClass("active show");
+			$link.addClass("active");
+			$pane.addClass("active show");
+		});
+	}
+
+	$nav.find(".nav-link").first().trigger("click");
+	if ($nav.find(".nav-item").length <= 1) $tabs_list.addClass("hidden");
+}
+
+function render_fields_into($pane, fields, doc, ctx, parent) {
 	let $section = null;
 	let $columns = null;
 	let $column = null;
@@ -175,7 +235,7 @@ function render_doc_fields(container, doctype, doc, ctx) {
 		$columns = null;
 		$column = null;
 		if (!ok) return;
-		$section = $('<div class="form-section card-section"></div>').appendTo($root);
+		$section = $('<div class="form-section card-section"></div>').appendTo($pane);
 		if (label) $('<div class="section-head"></div>').text(__(label)).appendTo($section);
 		$columns = $('<div class="section-body side-panel-detail-columns"></div>').appendTo(
 			$section
@@ -187,7 +247,7 @@ function render_doc_fields(container, doctype, doc, ctx) {
 		$column = $('<div class="form-column side-panel-detail-column"></div>').appendTo($columns);
 	};
 
-	for (const df of meta.fields) {
+	for (const df of fields) {
 		if (df.fieldtype === "Section Break") {
 			open_section(
 				df.label,
@@ -226,7 +286,7 @@ function render_doc_fields(container, doctype, doc, ctx) {
 		);
 	}
 
-	$root.find(".form-section").each(function () {
+	$pane.find(".form-section").each(function () {
 		if (!$(this).find(".frappe-control").length) $(this).remove();
 	});
 }
