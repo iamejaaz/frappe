@@ -1209,6 +1209,7 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 			if (this.report_settings.get_datatable_options) {
 				datatable_options = this.report_settings.get_datatable_options(datatable_options);
 			}
+			this.recover_from_zero_size_render();
 			this.datatable = new window.DataTable(this.$report[0], datatable_options);
 		}
 
@@ -1220,6 +1221,25 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 		}
 
 		this.setup_link_side_panel();
+	}
+
+	// HyperList reads the scrollable's size once at construction; if the page had no
+	// layout at that moment (hidden page-container, background tab) it locks in an
+	// inline 0x0 that even datatable.refresh() reads back. Rebuild once we have size.
+	recover_from_zero_size_render() {
+		this.zero_size_observer?.disconnect();
+		const wrapper = this.$report[0];
+		this.zero_size_observer = new ResizeObserver(() => {
+			if (!wrapper.offsetWidth) return;
+			this.zero_size_observer.disconnect();
+			this.zero_size_observer = null;
+			const scrollable = wrapper.querySelector(".dt-scrollable");
+			if (scrollable && (!scrollable.offsetWidth || !scrollable.offsetHeight)) {
+				this.datatable = null;
+				this.render_datatable();
+			}
+		});
+		this.zero_size_observer.observe(wrapper);
 	}
 
 	setup_link_side_panel() {
