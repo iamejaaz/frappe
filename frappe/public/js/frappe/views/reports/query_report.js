@@ -1222,8 +1222,6 @@ frappe.views.QueryReport = class QueryReport extends frappe.views.BaseList {
 		this.setup_link_side_panel();
 	}
 
-	// Preview Link cells in the side panel. Query report columns carry fieldtype directly
-	// (report_utils.prepare_field_from_column) rather than a docfield.
 	setup_link_side_panel() {
 		this.$report
 			.off("click.side-panel")

@@ -9,11 +9,10 @@ export default class Tab {
 		this.layout = layout;
 		this.df = df || {};
 		this.frm = frm;
-		// Use layout.doctype for child tables, otherwise frm.doctype. The final fallback covers
-		// frm-less layouts, where render()'s synthesized opening tab has no `parent` either.
+		// Use layout.doctype for child tables, otherwise frm.doctype
 		this.doctype = layout?.is_child_table
 			? layout.doctype
-			: this.frm?.doctype ?? this.df.parent ?? layout?.doctype;
+			: this.frm?.doctype ?? this.df.parent;
 		this.label = this.df && this.df.label;
 		this.tab_link_container = tab_link_container;
 		this.tabs_content = tabs_content;
