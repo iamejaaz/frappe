@@ -58,6 +58,20 @@ function is_safe_url(url) {
 	return typeof url === "string" && (url.startsWith("/") || /^https?:\/\//.test(url));
 }
 
+function get_read_only_docfields(doctype, metas) {
+	return (metas[doctype]?.fields || []).map((df) => {
+		const clone = { ...df, parent: doctype, read_only: 1 };
+		clone.get_status = (field) =>
+			cint(field.df.hidden) || cint(field.df.hidden_due_to_dependency) ? "None" : "Read";
+
+		if (TABLE_FIELDTYPES.has(df.fieldtype) && df.options) {
+			clone.fields = get_read_only_docfields(df.options, metas);
+		}
+
+		return clone;
+	});
+}
+
 function render_field_value($value, df, doc) {
 	const raw = doc[df.fieldname];
 
@@ -295,6 +309,8 @@ frappe.ui.SidePanel = class SidePanel {
 	constructor() {
 		this.history = [];
 		this.metas = {};
+		this.layouts = {};
+		this.cached_docfield_copies = [];
 		this.token = 0;
 		this.current = null;
 		this.preview = null;
@@ -448,13 +464,76 @@ frappe.ui.SidePanel = class SidePanel {
 	}
 
 	render_doc(preview) {
-		this.$body.find(".side-panel-doc").remove();
-		const $doc = $('<div class="side-panel-doc">').appendTo(this.$body);
-		render_doc_fields($doc, preview.doc.doctype, preview.doc, {
-			metas: this.metas,
-			permlevels: preview.permlevels || [0],
-			open_row: (child_doctype, row) => this.open_row_dialog(child_doctype, row),
-		});
+		const doc = preview.doc;
+		const doctype = doc.doctype;
+		let entry = this.layouts[doctype];
+
+		if (!entry) {
+			const $wrapper = $('<div class="side-panel-doc">').appendTo(this.$body);
+			const layout = new frappe.ui.form.Layout({
+				parent: $wrapper,
+				doctype: doctype,
+				fields: get_read_only_docfields(doctype, this.metas),
+				doc: doc,
+				card_layout: true,
+			});
+			layout.make();
+			entry = this.layouts[doctype] = { layout, $wrapper };
+		}
+
+		this.$body.find(".side-panel-doc").addClass("hidden");
+		entry.$wrapper.removeClass("hidden");
+
+		entry.layout.doc = doc;
+		this.prepare_grids(entry.layout, doc);
+		entry.layout.refresh(doc);
+		this.make_rows_openable(entry.layout);
+		if (frappe.meta.docfield_copy[doctype]?.[doc.name]) {
+			this.cached_docfield_copies.push([doctype, doc.name]);
+		}
+	}
+
+	prepare_grids(layout, doc) {
+		for (const field of layout.fields_list || []) {
+			const grid = field.grid;
+			if (!grid) continue;
+
+			const rows = doc[field.df.fieldname] || [];
+			field.df.data = rows;
+			if (grid.df && grid.df !== field.df) grid.df.data = rows;
+
+			grid.static_rows = true;
+		}
+	}
+
+	make_rows_openable(layout) {
+		for (const field of layout.fields_list || []) {
+			const child_doctype = field.df?.options;
+			if (!child_doctype) continue;
+
+			for (const row of field.grid?.grid_rows || []) {
+				if (!row.doc || !row.row) continue;
+
+				if (frappe.meta.docfield_copy[child_doctype]?.[row.doc.name]) {
+					this.cached_docfield_copies.push([child_doctype, row.doc.name]);
+				}
+
+				if (row.__side_panel_bound) continue;
+				row.__side_panel_bound = true;
+
+				row.row.css("cursor", "pointer").on("click", (e) => {
+					if ($(e.target).closest("a, button, input").length) return;
+					this.open_row_dialog(child_doctype, row.doc);
+				});
+			}
+		}
+	}
+
+	clear_cached_docfield_copies() {
+		for (const [doctype, docname] of this.cached_docfield_copies) {
+			delete frappe.meta.docfield_copy[doctype]?.[docname];
+		}
+		this.cached_docfield_copies = [];
 	}
 
 	open_row_dialog(child_doctype, row_doc) {
@@ -502,7 +581,7 @@ frappe.ui.SidePanel = class SidePanel {
 
 	set_state(state) {
 		this.$body.find(".side-panel-message").remove();
-		if (state !== "ready") this.$body.find(".side-panel-doc").remove();
+		if (state !== "ready") this.$body.find(".side-panel-doc").addClass("hidden");
 
 		const message =
 			state === "loading"
@@ -537,6 +616,7 @@ frappe.ui.SidePanel = class SidePanel {
 		this.current = null;
 		this.preview = null;
 		this.row_dialog?.hide();
+		this.clear_cached_docfield_copies();
 	}
 };
 

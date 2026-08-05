@@ -12,7 +12,7 @@ export default class Tab {
 		// Use layout.doctype for child tables, otherwise frm.doctype
 		this.doctype = layout?.is_child_table
 			? layout.doctype
-			: this.frm?.doctype ?? this.df.parent;
+			: this.frm?.doctype ?? this.df.parent ?? layout?.doctype;
 		this.label = this.df && this.df.label;
 		this.tab_link_container = tab_link_container;
 		this.tabs_content = tabs_content;

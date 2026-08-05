@@ -101,10 +101,12 @@ body.side-panel-resizing {
 	min-height: 0;
 	overflow-y: auto;
 
-	.side-panel-detail {
+	.side-panel-detail,
+	.form-layout {
 		padding: 0 0 var(--padding-md);
 	}
 
+	.form-page,
 	.section-head,
 	.section-body {
 		max-width: none;
