@@ -130,7 +130,7 @@ class ConnectedApp(Document):
 		user = user or frappe.session.user
 		token_cache = self.get_token_cache(user)
 
-		if token_cache:
+		if token_cache and (token_cache.access_token or token_cache.refresh_token):
 			return token_cache
 
 		redirect = self.initiate_web_application_flow(user, success_uri)
@@ -156,7 +156,10 @@ class ConnectedApp(Document):
 	def get_active_token(self, user=None):
 		user = user or frappe.session.user
 		token_cache = self.get_token_cache(user)
-		if token_cache and token_cache.is_expired():
+		if not (token_cache and (token_cache.access_token or token_cache.refresh_token)):
+			return None
+
+		if token_cache.is_expired():
 			try:
 				with filelock(f"token_cache_{token_cache.name}"):
 					# Another worker may have refreshed while we waited for the lock.
