@@ -457,7 +457,6 @@ frappe.PermissionEngine = class PermissionEngine {
 		});
 
 		this.body.on("click", "input[type='checkbox']", function () {
-			frappe.dom.freeze();
 			let chk = $(this);
 			let args = {
 				role: chk.attr("data-role"),
@@ -472,22 +471,18 @@ frappe.PermissionEngine = class PermissionEngine {
 				page: "permission_manager",
 				method: "update",
 				args: args,
-				callback: (r) => {
-					frappe.dom.unfreeze();
-					if (r.exc) {
-						// exception: reverse
-						chk.prop("checked", !chk.prop("checked"));
-					} else {
-						me.get_perm(args.role)[args.ptype] = args.value;
+				freeze: true,
+				callback: () => {
+					me.get_perm(args.role)[args.ptype] = args.value;
 
-						if (args.ptype == "if_owner") {
-							let report_checkbox = chk
-								.closest("div.row")
-								.find("div[data-fieldname='report']");
-							report_checkbox.toggle(!args.value);
-						}
+					if (args.ptype == "if_owner") {
+						let report_checkbox = chk
+							.closest("div.row")
+							.find("div[data-fieldname='report']");
+						report_checkbox.toggle(!args.value);
 					}
 				},
+				error: () => chk.prop("checked", !chk.prop("checked")),
 			});
 		});
 	}

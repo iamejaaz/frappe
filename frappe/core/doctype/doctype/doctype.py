@@ -1931,7 +1931,7 @@ def get_fields_not_allowed_in_list_view(meta) -> list[str]:
 
 def validate_permissions_for_doctype(doctype, for_remove=False, alert=False):
 	"""Validates if permissions are set correctly."""
-	doctype = frappe.get_doc("DocType", doctype)
+	doctype = Meta(doctype)
 	validate_permissions(doctype, for_remove, alert=alert)
 
 	# save permissions
