@@ -315,11 +315,12 @@ frappe.views.Calendar = class Calendar {
 		this.cal_options = {
 			plugins: frappe.FullCalendar.Plugins,
 			initialView: defaults.initialView || "dayGridMonth",
+			locales: frappe.FullCalendar.locales,
 			locale: frappe.boot.lang,
 			eventTimeFormat: {
 				hour: "numeric",
 				minute: "2-digit",
-				hour12: true,
+				hour12: !frappe.datetime.get_user_time_fmt().includes("H"),
 			},
 			firstDay: frappe.datetime.get_first_day_of_the_week_index(),
 			eventDisplay: "block",
