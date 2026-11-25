@@ -68,7 +68,7 @@
    "depends_on": "eval:doc.doctype_or_field=='DocField'",
    "description": "ID (name) of the entity whose property is to be set",
    "fieldname": "field_name",
-   "fieldtype": "Data",
+   "fieldtype": "Autocomplete",
    "in_standard_filter": 1,
    "label": "Field Name",
    "search_index": 1
@@ -129,7 +129,7 @@
  "idx": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-11-05 09:20:18.264619",
+ "modified": "2026-11-25 20:30:00.000000",
  "modified_by": "Administrator",
  "module": "Custom",
  "name": "Property Setter",
